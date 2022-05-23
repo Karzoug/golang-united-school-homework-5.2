@@ -17,7 +17,7 @@ func NewCache() Cache {
 	return Cache{items: map[string]CacheItem{}}
 }
 
-func (c Cache) Get(key string) (string, bool) {
+func (c *Cache) Get(key string) (string, bool) {
 	item, exists := c.items[key]
 	if !exists {
 		return "", false
@@ -31,23 +31,23 @@ func (c Cache) Get(key string) (string, bool) {
 	return item.value, true
 }
 
-func (c Cache) Put(key, value string) {
+func (c *Cache) Put(key, value string) {
 	c.items[key] = CacheItem{value: value, timeExpired: maxTime}
 }
 
-func (c Cache) Keys() []string {
+func (c *Cache) Keys() []string {
 	ret := make([]string, 0, len(c.items))
 	for k, v := range c.items {
 		if time.Now().After(v.timeExpired) {
 			delete(c.items, k)
 		} else {
-			ret = append(ret, v.value)
+			ret = append(ret, k)
 		}
 	}
 
 	return ret
 }
 
-func (c Cache) PutTill(key, value string, deadline time.Time) {
+func (c *Cache) PutTill(key, value string, deadline time.Time) {
 	c.items[key] = CacheItem{value: value, timeExpired: deadline}
 }
